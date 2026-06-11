@@ -53,6 +53,19 @@ void property_override(string prop, string value)
 
 void vendor_load_properties()
 {
+    // Bridge ro.boot.hwname → ro.boot.hardware.sku so that the
+    // config_disableApksUnlessMatchedSku overlay mechanism in
+    // FrameworksResOverlayBlossom can gate NFC/SE APKs to angelican only.
+    //
+    // Without this, ro.boot.hardware.sku is never set, PackageManager sees an
+    // empty SKU, the "angelican" entry in config_disableApkUnlessMatchedSku_skus_list
+    // never matches, and com.android.nfc is started on every variant regardless
+    // of whether the Samsung SN100 chip is present — producing 3× ANR at boot.
+    string hwname = GetProperty("ro.boot.hwname", "");
+    if (!hwname.empty()) {
+        property_override("ro.boot.hardware.sku", hwname);
+    }
+
     // dalvik heap configuration
     string heapstartsize, heapgrowthlimit, heapsize, heapminfree,
 			heapmaxfree, heaptargetutilization;

@@ -33,8 +33,17 @@ PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 -include vendor/lineage-priv/keys/keys.mk
 
 #Enable Blur
-TARGET_ENABLE_BLUR := true
-TARGET_SUPPORTS_BLUR := true
+# Disabled: TARGET_ENABLE_BLUR causes BackgroundBlurDrawable + SurfaceFlinger
+# RenderEngine to composite every frame with a Gaussian blur pass on the Mali
+# GPU. On this low-end Cortex-A53 / Mali-G52 MC2 platform the render thread and
+# surfaceflinger together consumed 73% + 42% CPU during the LAUNCHER_OPEN_ALL_APPS
+# animation (confirmed by crash.log ANR #3 CPU snapshot), starving newly-started
+# processes. This directly caused the third NFC ANR. Even on the first two boots
+# (before the launcher was animated) the system is CPU-constrained enough that
+# blur just adds unnecessary overhead. Use ro.surface_flinger.blur_disabled_by_default
+# in vendor.prop (already set to true) as the runtime gate; keep build flags off.
+TARGET_ENABLE_BLUR := false
+TARGET_SUPPORTS_BLUR := false
 
 #Bomb AudioFx
 BOMB_AUDIOFX := true
