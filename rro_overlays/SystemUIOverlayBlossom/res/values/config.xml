@@ -48,7 +48,11 @@
          prevent wasting cpu cycles on the dimming animation -->
     <bool name="config_navigation_bar_enable_auto_dim_no_visible_wallpaper">false</bool>
 
-    <!-- Blur radius behind Notification Shade -->
-    <dimen name="max_shade_window_blur_radius">17dp</dimen>
+    <!-- Blur radius behind Notification Shade.  Set to 0dp: the background blur
+         behind the shade is the second largest GPU cost after the launcher blur,
+         contributing directly to the surfaceflinger CPU spike seen in the ANR log.
+         Shade pull-down is frequent (any notification, any settings access), so
+         even a small per-frame blur cost accumulates into sustained CPU pressure. -->
+    <dimen name="max_shade_window_blur_radius">0dp</dimen>
 
 </resources>
